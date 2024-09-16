@@ -1,0 +1,9 @@
+[package]
+name = "omd"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+pulldown-cmark = "0.9.1"
+tempfile = "3.5.0"
+clap = { version = "4.4.0", features = ["derive"] }
