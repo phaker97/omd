@@ -7,3 +7,4 @@ edition = "2021"
 pulldown-cmark = "0.9.1"
 tempfile = "3.5.0"
 clap = { version = "4.4.0", features = ["derive"] }
+base64 = "0.22.1"
