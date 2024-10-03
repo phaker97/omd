@@ -1,6 +1,6 @@
 # omd
 
-**omd** is a simple, fast, and lightweight Markdown renderer and previewer written in Rust. It allows you to convert Markdown files to HTML and preview them in your browser, either statically or with live-reload support.
+**omd** is a simple, fast, and lightweight Markdown renderer and previewer written in Rust. It allows you to convert Markdown files to HTML and preview them in your browser, either statically or with live-reload support. 
 
 ## Features
 
@@ -20,7 +20,7 @@
 
 1. **Clone the Repository**
 
-   git clone https://github.com/yourusername/omd.git
+   git clone https://github.com/ptrglbvc/omd.git
    cd omd
 
 
@@ -126,4 +126,3 @@ Please make sure to update tests as appropriate.
 ## Contact
 
 For questions or suggestions, feel free to open an issue or reach out via email at [petar0golubovic@gmail.com](mailto:petar0golubovic@gmail.com).
-

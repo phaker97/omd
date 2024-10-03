@@ -1,12 +1,15 @@
 #![allow(warnings)]
 use base64::encode;
 use notify::Watcher;
+use std::default;
 use std::fs::File;
 use std::io::{self, Read, Write};
+use std::net::IpAddr;
 use std::path::PathBuf;
 
 use clap::Parser;
 use futures_util::stream::{Stream, StreamExt};
+use local_ip_address::local_ip;
 use pulldown_cmark::{html, Event, Options, Parser as MdParser};
 use std::pin::Pin;
 use tokio::sync::{broadcast, RwLock};
@@ -19,6 +22,12 @@ use std::sync::Arc;
 struct Args {
     #[arg(value_name = "FILE")]
     file: Option<PathBuf>,
+
+    #[arg(short = 'H', long = "host", default_value = "127.0.0.1")]
+    host: String,
+
+    #[arg(short = 'P', long = "port", default_value = "3030")]
+    port: u16,
 
     #[arg(short, long)]
     static_mode: bool,
@@ -169,10 +178,23 @@ async fn run_server_mode(args: &Args) -> io::Result<()> {
             warp::sse::reply(stream)
         });
 
-    println!("Server running at http://localhost:3030/");
-    open_in_browser("http://127.0.0.1:3030/".to_string());
+    let mut host = args.host.clone();
+    if args.host == "0.0.0.0" {
+        if let Ok(local_ip_address) = local_ip() {
+            host = local_ip_address.to_string()
+        }
+    }
+
+    println!("Server running at http://{}:{}", host, args.port);
+    open_in_browser(format!("http://{}:{}", host, args.port));
+
+    let address: IpAddr = args
+        .host
+        .parse()
+        .map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e))?;
+
     warp::serve(html_route.or(sse_route))
-        .run(([127, 0, 0, 1], 3030))
+        .run((address, args.port))
         .await;
     Ok(())
 }
