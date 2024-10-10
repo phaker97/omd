@@ -105,3 +105,17 @@ code::-webkit-scrollbar-corner {
 hr {
     border-color: #fdd7d0;
 }
+
+blockquote {
+    background-color: #5a3233;
+    color: #fdd7d0;
+    border-left: 5px solid #ff6961;
+    padding: 15px 20px;
+    margin: 20px 0;
+    font-style: italic;
+}
+
+blockquote p {
+	margin-top: 7px;
+	margin-bottom: 7px;
+}
