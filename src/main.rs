@@ -35,7 +35,6 @@ struct Args {
 
 #[tokio::main]
 async fn main() -> io::Result<()> {
-    // Parse command-line arguments
     let args = Args::parse();
 
     if args.static_mode {
@@ -48,7 +47,6 @@ async fn main() -> io::Result<()> {
 }
 
 fn run_static_mode(args: &Args) -> io::Result<()> {
-    // Read Markdown content
     let (file_name, markdown_input) = match &args.file {
         Some(file_path) => {
             let mut file = File::open(&file_path).unwrap_or_else(|err| {
@@ -63,7 +61,6 @@ fn run_static_mode(args: &Args) -> io::Result<()> {
             )
         }
         None => {
-            // Read from stdin if no file is provided
             let mut content = String::new();
             io::stdin().read_to_string(&mut content)?;
             (String::from("New file"), content)
@@ -75,7 +72,6 @@ fn run_static_mode(args: &Args) -> io::Result<()> {
     let fonts = read_fonts();
     let html_content = build_full_html(&file_name, &html_output, &style, &fonts, false);
 
-    // Create a temporary file with .html extension
     let temp_file = tempfile::Builder::new()
         .prefix("markdown_preview_")
         .suffix(".html")
@@ -85,13 +81,10 @@ fn run_static_mode(args: &Args) -> io::Result<()> {
 
     open_in_browser(temp_path);
 
-    // Write HTML content to the temporary file
     let mut file = temp_file.as_file();
     file.write_all(html_content.as_bytes())?;
     file.flush()?;
 
-    // Open the default browser
-    // Keep the program running to prevent the temporary file from being deleted
     println!("Press Enter to exit...");
     let mut input = String::new();
     io::stdin().read_line(&mut input)?;
