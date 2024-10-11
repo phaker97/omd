@@ -1,7 +1,12 @@
 [package]
-name = "omd"
+name = "omd.md"
 version = "0.1.0"
 edition = "2021"
+description = "A minimalistic and slick looking markdown viewer with support for hot reloading"
+license = "MIT"
+repository = "https://github.com/ptrglbvc/omd"
+keywords = ["markdown", "md", "dark-mode"]
+categories = ["markdown", "cli"]
 
 [dependencies]
 pulldown-cmark = "0.9.1"
