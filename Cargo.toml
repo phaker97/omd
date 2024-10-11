@@ -1,6 +1,6 @@
 [package]
 name = "omdd"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "A minimalistic and slick looking markdown viewer with support for hot reloading"
 license = "MIT"
