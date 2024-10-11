@@ -1,5 +1,5 @@
 [package]
-name = "omd.md"
+name = "omd"
 version = "0.1.0"
 edition = "2021"
 description = "A minimalistic and slick looking markdown viewer with support for hot reloading"
