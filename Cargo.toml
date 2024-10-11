@@ -6,7 +6,7 @@ description = "A minimalistic and slick looking markdown viewer with support for
 license = "MIT"
 repository = "https://github.com/ptrglbvc/omd"
 keywords = ["markdown", "md", "dark-mode"]
-categories = ["markdown", "cli"]
+categories = ["parsing", "command-line-utilities"]
 
 [dependencies]
 pulldown-cmark = "0.9.1"
