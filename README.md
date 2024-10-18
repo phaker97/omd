@@ -1,8 +1,6 @@
-# omdd
+# omd
 
-**omdd** is a simple, fast, and lightweight Markdown renderer and previewer written in Rust. It allows you to convert Markdown files to HTML and preview them in your browser, either statically or with live-reload support.
-
-Was supposed to be called `omd`, but some asshole had to take that name.
+**omd** is a simple, fast, and lightweight Markdown renderer and previewer written in Rust. It allows you to convert Markdown files to HTML and preview them in your browser, either statically or with live-reload support.
 
 ## Features
 
@@ -23,7 +21,7 @@ Was supposed to be called `omd`, but some asshole had to take that name.
 1. **Clone the Repository**
 
    git clone https://github.com/ptrglbvc/omd.git
-   cd omdd
+   cd omd
 
 
 2. **Build the Project**
@@ -33,22 +31,22 @@ Was supposed to be called `omd`, but some asshole had to take that name.
 
 3. **Install**
 
-   Optionally, you can install `omdd` to your local Cargo bin directory:
+   Optionally, you can install `omd` to your local Cargo bin directory:
 
    cargo install --path .
 
 
-   This allows you to run `omdd` from anywhere on your system.
+   This allows you to run `omd` from anywhere on your system.
 
 ### Get it from crates.io
 
-   Run `cargo install omdd`
+   Run `cargo install omd`
 
    That is it.
 
 ## Usage
 
-omddd [OPTIONS] [FILE]
+omd [OPTIONS] [FILE]
 
 
 ### Options
@@ -61,19 +59,19 @@ omddd [OPTIONS] [FILE]
 
 Convert a Markdown file to HTML and open it in your browser:
 
-omddd --static-mode README.md
+omd --static-mode README.md
 
 
-If no file is specified, `omdd` will read from `stdin`:
+If no file is specified, `omd` will read from `stdin`:
 
-cat README.md | omdd --static-mode
+cat README.md | omd --static-mode
 
 
 #### Server Mode (Live Preview)
 
 Start a local server to preview your Markdown file with live-reload functionality:
 
-omdd README.md
+omd README.md
 
 
 Open [http://localhost:3030](http://localhost:3030) in your browser. Whenever you save changes to `README.md`, the browser will automatically reload to reflect the updates.
@@ -90,7 +88,7 @@ The application uses embedded fonts and a favicon located in the `fonts` directo
 
 ## Supported Markdown Extensions
 
-`omdd` supports several CommonMark extensions:
+`omd` supports several CommonMark extensions:
 
 - **Strikethrough**
 - **Tables**
