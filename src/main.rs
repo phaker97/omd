@@ -121,7 +121,6 @@ fn open_in_browser(link: String) {
     #[cfg(target_os = "linux")]
     {
         if check_for_wsl2() {
-            println!("Found wsl2!");
             std::process::Command::new("powershell.exe")
                 .args(&["-c", "start", &link])
                 .spawn()
