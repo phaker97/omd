@@ -6,6 +6,7 @@ use std::fs::File;
 use std::io::{self, Read, Write};
 use std::net::IpAddr;
 use std::path::PathBuf;
+use std::time::Duration;
 
 use clap::Parser;
 use futures_util::stream::{Stream, StreamExt};
@@ -92,6 +93,16 @@ fn run_static_mode(args: &Args) -> io::Result<()> {
     Ok(())
 }
 
+fn check_for_wsl2() -> bool {
+    let wslinterop = PathBuf::from(r"/proc/sys/fs/binfmt_misc/WSLInterop");
+    if wslinterop.exists() {
+        return true;
+    }
+    // From here could add other conditional checks for wsl2
+    // based on https://superuser.com/questions/1749781/how-can-i-check-if-the-environment-is-wsl-from-a-shell-script
+    false
+}
+
 fn open_in_browser(link: String) {
     #[cfg(target_os = "macos")]
     {
@@ -109,10 +120,18 @@ fn open_in_browser(link: String) {
     }
     #[cfg(target_os = "linux")]
     {
-        std::process::Command::new("xdg-open")
-            .arg(&link)
-            .spawn()
-            .expect("Failed to open browser");
+        if check_for_wsl2() {
+            println!("Found wsl2!");
+            std::process::Command::new("powershell.exe")
+                .args(&["-c", "start", &link])
+                .spawn()
+                .expect("Failed to open browser from wsl2 instance");
+        } else {
+            std::process::Command::new("xdg-open")
+                .arg(&link)
+                .spawn()
+                .expect("Failed to open browser");
+        }
     }
 }
 // fn sse_event()
@@ -250,14 +269,38 @@ struct AppState {
 }
 
 fn watch_markdown_file(app_state: Arc<AppState>) {
-    use notify::{Config, Event, EventKind, RecommendedWatcher, RecursiveMode};
+    use notify::{Config, Event, EventKind, PollWatcher, RecommendedWatcher, RecursiveMode};
     use std::sync::mpsc::channel;
 
+    /// Made an Enum so that either watcher could be brought out of
+    /// the if/else scopes
+    enum WatcherType {
+        PollWatcher(PollWatcher),
+        RecommendedWatcher(RecommendedWatcher),
+    }
+
     let (tx_notify, rx_notify) = channel();
-    let mut watcher = RecommendedWatcher::new(tx_notify, Config::default()).unwrap();
-    watcher
-        .watch(app_state.file_path.as_path(), RecursiveMode::NonRecursive)
+    let watcher = if check_for_wsl2() {
+        // For whatever reason, recommended watcher was erroring out
+        // when used within WSL2
+        // notify issue https://github.com/notify-rs/notify/issues/254
+        // recommended using pollwatcher which worked in my testing
+        let mut watcher = PollWatcher::new(
+            tx_notify,
+            Config::default().with_poll_interval(Duration::from_millis(500)),
+        )
         .unwrap();
+        watcher
+            .watch(app_state.file_path.as_path(), RecursiveMode::NonRecursive)
+            .unwrap();
+        WatcherType::PollWatcher(watcher)
+    } else {
+        let mut watcher = RecommendedWatcher::new(tx_notify, Config::default()).unwrap();
+        watcher
+            .watch(app_state.file_path.as_path(), RecursiveMode::NonRecursive)
+            .unwrap();
+        WatcherType::RecommendedWatcher(watcher)
+    };
 
     for res in rx_notify {
         match res {
