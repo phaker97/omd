@@ -1,22 +1,21 @@
 #![allow(warnings)]
-use base64::encode;
-use notify::Watcher;
 use std::default;
 use std::fs::File;
 use std::io::{self, Read, Write};
 use std::net::IpAddr;
 use std::path::PathBuf;
+use std::pin::Pin;
+use std::sync::Arc;
 use std::time::Duration;
 
+use base64::encode;
 use clap::Parser;
 use futures_util::stream::{Stream, StreamExt};
 use local_ip_address::local_ip;
+use notify::Watcher;
 use pulldown_cmark::{html, Event, Options, Parser as MdParser};
-use std::pin::Pin;
 use tokio::sync::{broadcast, RwLock};
 use warp::{sse, Filter};
-
-use std::sync::Arc;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
