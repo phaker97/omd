@@ -390,6 +390,17 @@ fn build_full_html(
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="data:image/x-icon;base64,{}">
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {{
+            const footnotes = document.querySelectorAll('.footnote-definition');
+            if (footnotes.length > 0) {{
+                const container = document.createElement('div');
+                container.id = 'footnote-container';
+                footnotes.forEach(footnote => container.appendChild(footnote));
+                document.body.appendChild(container);
+            }}
+        }});
+    </script>
     <style>
         @font-face {{
             font-family: 'Oswald';

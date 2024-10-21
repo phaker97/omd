@@ -6,7 +6,7 @@
 
 - **Static Mode**: Convert Markdown files to HTML and open them directly in your default browser without running a server.
 - **Server Mode**: Run a local server to preview your Markdown files with live-reload functionality as you edit them.
-- **CommonMark Extensions**: Supports strikethrough, tables, footnotes, task lists, and smart punctuation.
+- **CommonMark Extensions**: Supports strikethrough, tables, footnotes, task lists, etc.
 - **Customizable Styling**: Includes default CSS styling, which can be customized by editing `style.css`.
 - **Embedded Fonts and Favicon**: Uses embedded fonts and favicon for a consistent look and self-contained HTML output.
 
@@ -20,34 +20,40 @@
 
 1. **Clone the Repository**
 
+   ```bash
    git clone https://github.com/ptrglbvc/omd.git
    cd omd
-
+   ```
 
 2. **Build the Project**
 
+   ```bash
    cargo build --release
-
+   ```
 
 3. **Install**
 
    Optionally, you can install `omd` to your local Cargo bin directory:
 
+   ```bash
    cargo install --path .
-
+   ```
 
    This allows you to run `omd` from anywhere on your system.
 
 ### Get it from crates.io
 
-   Run `cargo install omd`
+   ```bash
+   cargo install omd
+   ```
 
    That is it.
 
 ## Usage
 
+```
 omd [OPTIONS] [FILE]
-
+```
 
 ### Options
 
@@ -59,44 +65,31 @@ omd [OPTIONS] [FILE]
 
 Convert a Markdown file to HTML and open it in your browser:
 
+```bash
 omd --static-mode README.md
-
+```
 
 If no file is specified, `omd` will read from `stdin`:
 
+```bash
 cat README.md | omd --static-mode
-
+```
 
 #### Server Mode (Live Preview)
 
 Start a local server to preview your Markdown file with live-reload functionality:
 
+```bash
 omd README.md
-
+```
 
 Open [http://localhost:3030](http://localhost:3030) in your browser. Whenever you save changes to `README.md`, the browser will automatically reload to reflect the updates.
 
-## Configuration
+Note that it will crash if the port is taken, like for example if you have another instance of omd openned. To solve this change the port number with the `--port` flag. Like so:
 
-### Custom CSS
-
-You can customize the CSS styling by editing the `style.css` file located in the `src` directory or by replacing it with your own CSS file.
-
-### Fonts and Favicon
-
-The application uses embedded fonts and a favicon located in the `fonts` directory and `favicon.ico` respectively. To use your own fonts or icon, replace these files and update the code if necessary.
-
-## Supported Markdown Extensions
-
-`omd` supports several CommonMark extensions:
-
-- **Strikethrough**
-- **Tables**
-- **Footnotes**
-- **Task Lists**
-- **Smart Punctuation**
-
-These extensions are enabled by default to enhance the formatting capabilities of your Markdown files.
+```bash
+omd --port 6969 README.md
+```
 
 ## How It Works
 

@@ -10,8 +10,10 @@ body {
     padding-left: 5%;
     padding-right: 5%;
     padding-top: 25px;
+    padding-bottom: 5%;
     border: solid 0.3px;
     min-height: 99svh;
+    position: relative;
 }
 
 pre {
@@ -113,9 +115,111 @@ blockquote {
     padding: 15px 20px;
     margin: 20px 0;
     font-style: italic;
+    border-radius: 3px;
 }
 
 blockquote p {
-	margin-top: 7px;
-	margin-bottom: 7px;
+    margin-top: 7px;
+    margin-bottom: 7px;
+}
+
+img {
+    max-width: min(1000px, 100%);
+    border-radius: 3px;
+    border: solid 0.3px;
+}
+
+li > input[type="checkbox"] {
+    display: inline-block;
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+    border: 2px solid #ff6961;
+    border-radius: 3px;
+    background-color: #5a3233;
+    vertical-align: middle;
+    cursor: pointer;
+    transition:
+        background-color 0.3s,
+        border-color 0.3s;
+}
+
+li > input[type="checkbox"]:checked {
+    background-color: #ff6961;
+    border-color: #ff6961;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23fdd7d0' d='M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z'/%3E%3C/svg%3E");
+    background-size: 14px 14px;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+li > input[type="checkbox"]:not(:checked):hover {
+    background-color: #ff847c;
+    border-color: #ff847c;
+}
+
+li > input[type="checkbox"]:checked:hover {
+    background-color: #ff4b41;
+    border-color: #ff4b41;
+}
+
+li > input[type="checkbox"][disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+li {
+    list-style-type: disc;
+}
+
+li:has(> input[type="checkbox"]) {
+    list-style-type: none;
+    display: flex;
+    align-items: center;
+}
+
+li:has(> input[type="checkbox"])::before {
+    content: none;
+}
+
+ul:has(input[type="checkbox"]) {
+    padding-left: 5px;
+}
+
+.footnote-definition {
+    display: none;
+}
+
+#footnote-container {
+    position: relative;
+    margin-top: 40px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px 5%;
+    border-top: 1px solid #fdd7d0;
+    background-color: #2f272f;
+}
+
+#footnote-container .footnote-definition {
+    display: flex;
+    align-items: baseline;
+}
+
+#footnote-container::before {
+    content: "Footnotes";
+    display: block;
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+
+.footnote-definition-label {
+    margin-right: 15px;
+}
+
+.footnote-reference {
+    font-size: 0.6em;
 }
