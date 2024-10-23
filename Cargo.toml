@@ -12,7 +12,9 @@ categories = ["parsing", "command-line-utilities"]
 lto = true
 
 [dependencies]
-pulldown-cmark = "0.9.1"
+pulldown-cmark = "0.12.2"
+latex-to-html = "0.1.2"
+fxhash = "0.2.1"
 tempfile = "3.5.0"
 clap = { version = "4.4.0", features = ["derive"] }
 base64 = "0.22.1"
@@ -21,4 +23,4 @@ warp = "0.3.3"
 async-stream = "0.3.4"
 notify = "6.1.1"
 futures-util = "0.3.30"
-local-ip-address = "0.4"
+local-ip-address = "0.6.3"

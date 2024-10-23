@@ -217,12 +217,7 @@ fn read_markdown_input(file_path: &PathBuf) -> io::Result<String> {
 }
 
 fn render_markdown_to_html(markdown_input: &str) -> String {
-    let mut options = Options::empty();
-    options.insert(Options::ENABLE_STRIKETHROUGH);
-    options.insert(Options::ENABLE_TABLES);
-    options.insert(Options::ENABLE_FOOTNOTES);
-    options.insert(Options::ENABLE_TASKLISTS);
-    options.insert(Options::ENABLE_SMART_PUNCTUATION);
+    let options = Options::all();
 
     let parser = MdParser::new_ext(&markdown_input, options);
     let mut html_output = String::new();
@@ -230,11 +225,35 @@ fn render_markdown_to_html(markdown_input: &str) -> String {
         &mut html_output,
         parser.map(|event| match event {
             Event::SoftBreak => Event::Html("<br>".into()),
+            Event::InlineMath(s) => Event::InlineMath(s),
+            Event::DisplayMath(s) => Event::DisplayMath(s),
             _ => event,
         }),
     );
     html_output
 }
+
+fn render_latex_to_svg(latex: pulldown_cmark::CowStr, inline: bool) -> String {
+    // Calculate hash to check if it has already been converted:
+    let hash = fxhash::hash(&latex);
+
+    match std::fs::read_to_string(format!("svgs/{}", hash)) {
+        Ok(content) => { return content }
+        Err(e) => {
+            // The svg has not been created yet
+            todo!()
+        }
+    }
+}
+
+fn render_latex_to_inline_svg(latex: pulldown_cmark::CowStr) -> String {
+    render_latex_to_svg(latex, true)
+}
+
+fn render_latex_to_display_svg(latex: pulldown_cmark::CowStr) -> String {
+    render_latex_to_svg(latex, false)
+}
+
 
 fn read_style_css() -> String {
     let css_file = include_str!("../src/style.css").to_string();
