@@ -13,7 +13,8 @@ use clap::Parser;
 use futures_util::stream::{Stream, StreamExt};
 use local_ip_address::local_ip;
 use notify::Watcher;
-use pulldown_cmark::{html, Event, Options, Parser as MdParser};
+use pulldown_cmark::{html, CowStr, Event, Options, Parser as MdParser};
+use pulldown_latex::push_mathml;
 use tokio::sync::{broadcast, RwLock};
 use warp::{sse, Filter};
 
@@ -217,12 +218,7 @@ fn read_markdown_input(file_path: &PathBuf) -> io::Result<String> {
 }
 
 fn render_markdown_to_html(markdown_input: &str) -> String {
-    let mut options = Options::empty();
-    options.insert(Options::ENABLE_STRIKETHROUGH);
-    options.insert(Options::ENABLE_TABLES);
-    options.insert(Options::ENABLE_FOOTNOTES);
-    options.insert(Options::ENABLE_TASKLISTS);
-    options.insert(Options::ENABLE_SMART_PUNCTUATION);
+    let mut options = Options::all();
 
     let parser = MdParser::new_ext(&markdown_input, options);
     let mut html_output = String::new();
@@ -230,10 +226,41 @@ fn render_markdown_to_html(markdown_input: &str) -> String {
         &mut html_output,
         parser.map(|event| match event {
             Event::SoftBreak => Event::Html("<br>".into()),
+            Event::InlineMath(s) => Event::Html(render_inline_latex_to_html(s).into()),
+            Event::DisplayMath(s) => Event::DisplayMath(render_inline_latex_to_html(s).into()),
             _ => event,
         }),
     );
     html_output
+}
+
+fn render_inline_latex_to_mathml(latex: CowStr) -> Result<String, impl std::error::Error> {
+    use pulldown_latex::{Parser as LParser, Storage};
+
+    let storage = Storage::new();
+    let config = Default::default();
+    let mut mathml = String::new();
+
+    let parser = LParser::new(&latex, &storage);
+
+    match push_mathml(&mut mathml, parser, config) {
+        Ok(()) => Ok(mathml),
+        Err(e) => Err(e)
+    }
+}
+
+fn render_inline_latex_to_html(latex: CowStr) -> String {
+    match render_inline_latex_to_mathml(latex) {
+        Ok(s) => format!("<span class=\"math math-inline\">{}</span>", s),
+        Err(e) => format!("<span class=\"math math-inline math-error\">{}</span>", e)
+    }
+}
+
+fn render_display_latex_to_html(latex: CowStr) -> String {
+    match render_inline_latex_to_mathml(latex) {
+        Ok(s) => format!("<span class=\"math math-display\">{}</span>", s),
+        Err(e) => format!("<span class=\"math math-display math-error\">{}</span>", e)
+    }
 }
 
 fn read_style_css() -> String {
@@ -381,6 +408,9 @@ fn build_full_html(
         ""
     };
 
+    // Can you make cargo do this?
+    let pulldown_latex_version = "0.7.0";
+
     format!(
         r#"
 <!DOCTYPE html>
@@ -389,6 +419,8 @@ fn build_full_html(
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="data:image/x-icon;base64,{}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/carloskiki/pulldown-latex@{pulldown_latex_version}/styles.min.css">
+    <link rel="preload" href="https://cdn.jsdelivr.net/gh/carloskiki/pulldown-latex@{pulldown_latex_version}/font/" as="font" crossorigin="anonymous">
     <script>
         document.addEventListener('DOMContentLoaded', function() {{
             const footnotes = document.querySelectorAll('.footnote-definition');
