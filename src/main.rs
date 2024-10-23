@@ -1,5 +1,4 @@
 #![allow(warnings)]
-use std::default;
 use std::fs::File;
 use std::io::{self, Read, Write};
 use std::net::IpAddr;
@@ -14,6 +13,7 @@ use futures_util::stream::{Stream, StreamExt};
 use local_ip_address::local_ip;
 use notify::Watcher;
 use pulldown_cmark::{html, CowStr, Event, Options, Parser as MdParser};
+use pulldown_latex::config::DisplayMode;
 use pulldown_latex::push_mathml;
 use tokio::sync::{broadcast, RwLock};
 use warp::{sse, Filter};
@@ -218,7 +218,7 @@ fn read_markdown_input(file_path: &PathBuf) -> io::Result<String> {
 }
 
 fn render_markdown_to_html(markdown_input: &str) -> String {
-    let mut options = Options::all();
+    let options = Options::all();
 
     let parser = MdParser::new_ext(&markdown_input, options);
     let mut html_output = String::new();
@@ -227,40 +227,42 @@ fn render_markdown_to_html(markdown_input: &str) -> String {
         parser.map(|event| match event {
             Event::SoftBreak => Event::Html("<br>".into()),
             Event::InlineMath(s) => Event::Html(render_inline_latex_to_html(s).into()),
-            Event::DisplayMath(s) => Event::DisplayMath(render_inline_latex_to_html(s).into()),
+            Event::DisplayMath(s) => Event::Html(render_display_latex_to_html(s).into()),
             _ => event,
         }),
     );
     html_output
 }
 
-fn render_inline_latex_to_mathml(latex: CowStr) -> Result<String, impl std::error::Error> {
-    use pulldown_latex::{Parser as LParser, Storage};
+fn render_latex_to_mathml(latex: CowStr, inline: bool) -> Result<String, impl std::error::Error> {
+    use pulldown_latex::{Parser as LParser, RenderConfig, Storage};
 
     let storage = Storage::new();
-    let config = Default::default();
+    let mut config = RenderConfig::default();
+    config.display_mode = if inline {
+        DisplayMode::Inline
+    } else {
+        DisplayMode::Block
+    };
+
     let mut mathml = String::new();
 
     let parser = LParser::new(&latex, &storage);
 
     match push_mathml(&mut mathml, parser, config) {
         Ok(()) => Ok(mathml),
-        Err(e) => Err(e)
+        Err(e) => Err(e),
     }
 }
 
 fn render_inline_latex_to_html(latex: CowStr) -> String {
-    match render_inline_latex_to_mathml(latex) {
-        Ok(s) => format!("<span class=\"math math-inline\">{}</span>", s),
-        Err(e) => format!("<span class=\"math math-inline math-error\">{}</span>", e)
-    }
+    render_latex_to_mathml(latex, true)
+        .unwrap_or_else(|e| format!("<span class=\"math math-inline math-error\">{}</span>", e))
 }
 
 fn render_display_latex_to_html(latex: CowStr) -> String {
-    match render_inline_latex_to_mathml(latex) {
-        Ok(s) => format!("<span class=\"math math-display\">{}</span>", s),
-        Err(e) => format!("<span class=\"math math-display math-error\">{}</span>", e)
-    }
+    render_latex_to_mathml(latex, false)
+        .unwrap_or_else(|e| format!("<span class=\"math math-display math-error\">{}</span>", e))
 }
 
 fn read_style_css() -> String {
