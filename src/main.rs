@@ -257,11 +257,13 @@ fn render_latex_to_mathml(latex: CowStr, inline: bool) -> Result<String, impl st
 
 fn render_inline_latex_to_html(latex: CowStr) -> String {
     render_latex_to_mathml(latex, true)
+        .map(|s| format!("<span class=\"math math-inline\">{}</span>", s))
         .unwrap_or_else(|e| format!("<span class=\"math math-inline math-error\">{}</span>", e))
 }
 
 fn render_display_latex_to_html(latex: CowStr) -> String {
     render_latex_to_mathml(latex, false)
+        .map(|s| format!("<span class=\"math math-display\">{}</span>", s))
         .unwrap_or_else(|e| format!("<span class=\"math math-display math-error\">{}</span>", e))
 }
 
